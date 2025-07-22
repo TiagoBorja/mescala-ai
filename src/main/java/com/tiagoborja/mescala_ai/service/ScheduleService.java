@@ -1,5 +1,6 @@
 package com.tiagoborja.mescala_ai.service;
 
+import com.tiagoborja.mescala_ai.Utils.DtoUtils;
 import com.tiagoborja.mescala_ai.entity.Group;
 import com.tiagoborja.mescala_ai.entity.Person;
 import com.tiagoborja.mescala_ai.entity.Schedule;
@@ -17,10 +18,9 @@ import java.util.stream.Collectors;
 public class ScheduleService {
 
     public Map<LocalDate, List<ScheduleResponseDTO>>generateRandomSchedule(@NotNull ScheduleRequestDTO scheduleRequestDTO) {
-        Map<LocalDate, List<ScheduleResponseDTO>> responseMap = new HashMap<>();
 
         // Just to fill with all schedules per day
-        Map<LocalDate, List<Schedule>> schedulePerDay = new HashMap<>();
+        Map<LocalDate, List<ScheduleResponseDTO>> responseMap = new HashMap<>();
         List<String> groups = scheduleRequestDTO.groups();
         List<PersonRequestDTO> people = scheduleRequestDTO.people();
         List<LocalDate> days = scheduleRequestDTO.days();
@@ -59,7 +59,9 @@ public class ScheduleService {
 
 
                 if (selectedPerson != null) {
-                    Person personEntity = convertDtoToEntity(selectedPerson);
+                    Person personEntity = DtoUtils.genericMapper(selectedPerson, Person.class);
+                    System.out.println("Person entity mapped: " + personEntity);
+
                     assignedPeople.add(selectedPerson.name());
                     schedules.add(new Schedule(group, personEntity, day));
                 }

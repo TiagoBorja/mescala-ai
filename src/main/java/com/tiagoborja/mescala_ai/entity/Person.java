@@ -11,6 +11,9 @@ public class Person {
     private List<LocalDate> unavailable;
     private List<Group> groups;
 
+    public Person(){
+
+    }
     public String getName() {
         return name;
     }
