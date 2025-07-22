@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleService {
 
-    public Map<LocalDate, List<ScheduleResponseDTO>>generateRandomSchedule(@NotNull ScheduleRequestDTO scheduleRequestDTO) {
+    public Map<LocalDate, List<ScheduleResponseDTO>> generateRandomSchedule(@NotNull ScheduleRequestDTO scheduleRequestDTO) {
 
         // Just to fill with all schedules per day
         Map<LocalDate, List<ScheduleResponseDTO>> responseMap = new HashMap<>();
@@ -34,34 +34,20 @@ public class ScheduleService {
             for (String groupName : groups) {
                 Group group = new Group(groupName);
 
-                PersonRequestDTO selectedPerson = null;
 
-                for (PersonRequestDTO person : people) {
+                List<PersonRequestDTO> availablePeople = people.stream()
+                        .filter(p -> p.groups() != null && p.groups().contains(groupName))
+                        .filter(p -> p.unavailable() == null || !p.unavailable().contains(day))
+                        .filter(p -> !assignedPeople.contains(p.name()))
+                        .collect(Collectors.toList());
 
-                    // Ignore if the person are unavailable in this day
-                    if (person.unavailable() != null && person.unavailable().contains(day)) {
-                        continue;
-                    }
 
-                    // Check if person are assigned a one group
-                    if (person.groups() == null || !person.groups().contains(groupName)) {
-                        continue;
-                    }
-
-                    // Ignore if had a schedule
-                    if (assignedPeople.contains(person.name())) {
-                        continue;
-                    }
-
-                    selectedPerson = person;
-                    break;
-                }
-
+                PersonRequestDTO selectedPerson = availablePeople.isEmpty()
+                        ? null
+                        : getRandomPerson(availablePeople);
 
                 if (selectedPerson != null) {
                     Person personEntity = DtoUtils.genericMapper(selectedPerson, Person.class);
-                    System.out.println("Person entity mapped: " + personEntity);
-
                     assignedPeople.add(selectedPerson.name());
                     schedules.add(new Schedule(group, personEntity, day));
                 }
@@ -79,11 +65,8 @@ public class ScheduleService {
         return responseMap;
     }
 
-    public Person convertDtoToEntity(PersonRequestDTO dto) {
-        Person p = new Person();
-        p.setName(dto.name());
-        p.setGroups(dto.groups().stream().map(Group::new).collect(Collectors.toList()));
-        p.setUnavailable(dto.unavailable());
-        return p;
+    private PersonRequestDTO getRandomPerson(List<PersonRequestDTO> list) {
+        Random random = new Random();
+        return list.get(random.nextInt(list.size()));
     }
 }
