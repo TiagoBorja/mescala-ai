@@ -3,7 +3,9 @@ package com.tiagoborja.mescala_ai.service;
 import com.tiagoborja.mescala_ai.entity.Group;
 import com.tiagoborja.mescala_ai.entity.Person;
 import com.tiagoborja.mescala_ai.entity.Schedule;
-import com.tiagoborja.mescala_ai.entity.dto.ScheduleDTO;
+import com.tiagoborja.mescala_ai.entity.dto.request.PersonRequestDTO;
+import com.tiagoborja.mescala_ai.entity.dto.request.ScheduleRequestDTO;
+import com.tiagoborja.mescala_ai.entity.dto.response.ScheduleResponseDTO;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -14,41 +16,40 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleService {
 
-    public List<Schedule> generateRandomSchedule(@NotNull ScheduleDTO scheduleDTO) {
+    public Map<LocalDate, List<ScheduleResponseDTO>>generateRandomSchedule(@NotNull ScheduleRequestDTO scheduleRequestDTO) {
+        Map<LocalDate, List<ScheduleResponseDTO>> responseMap = new HashMap<>();
 
         // Just to fill with all schedules per day
-        List<Schedule> schedules = new ArrayList<>();
-        Map<String, Group> groups = scheduleDTO.groups();
-        List<Person> people = scheduleDTO.people();
-        List<LocalDate> days = scheduleDTO.days();
+        Map<LocalDate, List<Schedule>> schedulePerDay = new HashMap<>();
+        List<String> groups = scheduleRequestDTO.groups();
+        List<PersonRequestDTO> people = scheduleRequestDTO.people();
+        List<LocalDate> days = scheduleRequestDTO.days();
 
         // Verify all days that will have a schedule
         for (LocalDate day : days) {
-            Set<Person> assignedPeople = new HashSet<>();
+            Set<String> assignedPeople = new HashSet<>();
+            List<Schedule> schedules = new ArrayList<>();
 
             // Store all key/values on groupName
-            for (String groupName : groups.keySet()) {
+            for (String groupName : groups) {
+                Group group = new Group(groupName);
 
-                Group group = groups.get(groupName);
-                Person selectedPerson = null;
+                PersonRequestDTO selectedPerson = null;
 
-                for (Person person : people) {
+                for (PersonRequestDTO person : people) {
 
                     // Ignore if the person are unavailable in this day
-                    if (person.getUnavailable() != null && person.getUnavailable().contains(day)) {
+                    if (person.unavailable() != null && person.unavailable().contains(day)) {
                         continue;
                     }
 
                     // Check if person are assigned a one group
-                    if (person.getGroups() != null && !person.getGroups()
-                            .stream()
-                            .map(Group::getName).toList()
-                            .contains(groupName)) {
+                    if (person.groups() == null || !person.groups().contains(groupName)) {
                         continue;
                     }
 
                     // Ignore if had a schedule
-                    if (assignedPeople.contains(person)) {
+                    if (assignedPeople.contains(person.name())) {
                         continue;
                     }
 
@@ -56,12 +57,31 @@ public class ScheduleService {
                     break;
                 }
 
+
                 if (selectedPerson != null) {
-                    assignedPeople.add(selectedPerson);
-                    schedules.add(new Schedule(group, selectedPerson, day));
+                    Person personEntity = convertDtoToEntity(selectedPerson);
+                    assignedPeople.add(selectedPerson.name());
+                    schedules.add(new Schedule(group, personEntity, day));
                 }
             }
+
+            List<ScheduleResponseDTO> responseList = schedules.stream()
+                    .map(s -> new ScheduleResponseDTO(
+                            s.getGroup().getName(),
+                            s.getPerson().getName()
+                    ))
+                    .toList();
+
+            responseMap.put(day, responseList);
         }
-        return schedules;
+        return responseMap;
+    }
+
+    public Person convertDtoToEntity(PersonRequestDTO dto) {
+        Person p = new Person();
+        p.setName(dto.name());
+        p.setGroups(dto.groups().stream().map(Group::new).collect(Collectors.toList()));
+        p.setUnavailable(dto.unavailable());
+        return p;
     }
 }
