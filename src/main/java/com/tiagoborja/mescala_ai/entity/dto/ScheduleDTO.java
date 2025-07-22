@@ -5,8 +5,9 @@ import com.tiagoborja.mescala_ai.entity.Person;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public record ScheduleDTO(List<LocalDate> days,
-                          List<Group> groups,
+                          Map<String, Group> groups,
                           List<Person> people) {
 }

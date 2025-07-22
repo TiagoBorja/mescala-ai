@@ -1,11 +1,14 @@
 package com.tiagoborja.mescala_ai.entity;
 
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public class Person {
 
     private String name;
-    private String unavailable;
+    private List<LocalDate> unavailable;
     private List<Group> groups;
 
     public String getName() {
@@ -16,11 +19,11 @@ public class Person {
         this.name = name;
     }
 
-    public String getUnavailable() {
+    public List<LocalDate> getUnavailable() {
         return unavailable;
     }
 
-    public void setUnavailable(String unavailable) {
+    public void setUnavailable(List<LocalDate> unavailable) {
         this.unavailable = unavailable;
     }
 
