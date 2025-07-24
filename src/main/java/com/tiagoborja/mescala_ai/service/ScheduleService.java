@@ -12,10 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
+
+    private final Random random = new Random();
 
     public Map<LocalDate, List<ScheduleResponseDTO>> generateRandomSchedule(@NotNull ScheduleRequestDTO scheduleRequestDTO) {
 
@@ -39,7 +40,7 @@ public class ScheduleService {
                         .filter(p -> p.groups() != null && p.groups().contains(groupName))
                         .filter(p -> p.unavailable() == null || !p.unavailable().contains(day))
                         .filter(p -> !assignedPeople.contains(p.name()))
-                        .collect(Collectors.toList());
+                        .toList();
 
 
                 PersonRequestDTO selectedPerson = availablePeople.isEmpty()
@@ -66,7 +67,6 @@ public class ScheduleService {
     }
 
     private PersonRequestDTO getRandomPerson(List<PersonRequestDTO> list) {
-        Random random = new Random();
         return list.get(random.nextInt(list.size()));
     }
 }
