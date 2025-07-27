@@ -1,6 +1,7 @@
 package com.tiagoborja.mescala_ai.service;
 
 import com.tiagoborja.mescala_ai.entity.dto.response.ScheduleResponseDTO;
+import com.tiagoborja.mescala_ai.export.excel.enums.ExcelCellStyle;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -14,27 +15,17 @@ import java.util.*;
 public class ExportService {
 
     public Workbook createScheduleExcel(Map<LocalDate, List<ScheduleResponseDTO>> scheduleMap) {
-
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("SCHEDULE");
-
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        // Título
         Row titleRow = sheet.createRow(0);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("JULY");
-        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7)); // Ajusta se necessário
+        titleCell.setCellValue("JULHO");
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
 
-        CellStyle titleStyle = workbook.createCellStyle();
-        Font titleFont = workbook.createFont();
-        titleFont.setBold(true);
-        titleFont.setFontHeightInPoints((short) 16);
-        titleStyle.setFont(titleFont);
-        titleStyle.setAlignment(HorizontalAlignment.CENTER);
-        titleCell.setCellStyle(titleStyle);
+        titleCell.setCellStyle(ExcelCellStyle.createMainHeaderStyle(workbook));
 
-        // Obter grupos únicos, mantendo ordem (LinkedHashSet)
         Set<String> groups = new LinkedHashSet<>();
         for (List<ScheduleResponseDTO> schedules : scheduleMap.values()) {
             for (ScheduleResponseDTO schedule : schedules) {
@@ -42,47 +33,43 @@ public class ExportService {
             }
         }
 
-        // Cabeçalho
         Row headerRow = sheet.createRow(1);
-        Cell cell = headerRow.createCell(0);
-        cell.setCellValue("Date");
-        CellStyle headerStyle = workbook.createCellStyle();
-        Font headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerStyle.setFont(headerFont);
-        headerStyle.setAlignment(HorizontalAlignment.CENTER);
-        cell.setCellStyle(headerStyle);
+
+        Cell dateHeaderCell = headerRow.createCell(0);
+        dateHeaderCell.setCellValue("DATA");
+        dateHeaderCell.setCellStyle(ExcelCellStyle.createColumnHeaderStyle(workbook));
 
         int colIndex = 1;
         for (String group : groups) {
             Cell groupCell = headerRow.createCell(colIndex++);
             groupCell.setCellValue(group);
-            groupCell.setCellStyle(headerStyle);
+            groupCell.setCellStyle(ExcelCellStyle.createColumnHeaderStyle(workbook));
         }
 
-        // Preenchimento dos dados
         int rowIndex = 2;
         for (Map.Entry<LocalDate, List<ScheduleResponseDTO>> entry : scheduleMap.entrySet()) {
             Row row = sheet.createRow(rowIndex++);
-            row.createCell(0).setCellValue(entry.getKey().format(dateFormatter));
 
-            // Preenche colunas de grupos (com espaços vazios por padrão)
+            Cell dateCell = row.createCell(0);
+            dateCell.setCellValue(entry.getKey().format(dateFormatter));
+            dateCell.setCellStyle(ExcelCellStyle.createDataCellStyle(workbook));
+
             Map<String, ScheduleResponseDTO> groupMap = entry.getValue().stream()
                     .collect(java.util.stream.Collectors.toMap(ScheduleResponseDTO::group, s -> s));
 
             colIndex = 1;
             for (String group : groups) {
-                Cell c = row.createCell(colIndex++);
-                ScheduleResponseDTO s = groupMap.get(group);
-                if (s != null) {
-                    c.setCellValue(s.person());
+                Cell cell = row.createCell(colIndex++);
+                ScheduleResponseDTO schedule = groupMap.get(group);
+                if (schedule != null) {
+                    cell.setCellValue(schedule.person());
+                    cell.setCellStyle(ExcelCellStyle.createDataCellStyle(workbook));
                 } else {
-                    c.setCellValue("");
+                    cell.setCellStyle(ExcelCellStyle.createDataCellStyle(workbook));
                 }
             }
         }
 
-        // Ajustar colunas
         for (int i = 0; i <= groups.size(); i++) {
             sheet.autoSizeColumn(i);
         }
