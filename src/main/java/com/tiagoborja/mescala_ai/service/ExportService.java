@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 
 @Service
@@ -21,7 +22,7 @@ public class ExportService {
 
         Row titleRow = sheet.createRow(0);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("JULHO");
+        titleCell.setCellValue(LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()).toUpperCase());
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
 
         titleCell.setCellStyle(ExcelCellStyle.createMainHeaderStyle(workbook));
