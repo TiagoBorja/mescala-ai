@@ -55,6 +55,12 @@ public class ScheduleService {
                     assignedPeople.add(selectedPerson.name());
                     schedules.add(new Schedule(group, personEntity, day));
                 }
+
+                if(selectedPerson == null){
+                    Person nobody = new Person();
+                    nobody.setName("Ninguém para este dia");
+                    schedules.add(new Schedule(group, nobody, day));
+                }
             }
 
             List<ScheduleResponseDTO> responseList = schedules.stream()

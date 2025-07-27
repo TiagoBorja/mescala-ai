@@ -2,7 +2,7 @@ package com.tiagoborja.mescala_ai.controller;
 
 import com.tiagoborja.mescala_ai.entity.dto.request.ScheduleRequestDTO;
 import com.tiagoborja.mescala_ai.entity.dto.response.ScheduleResponseDTO;
-import com.tiagoborja.mescala_ai.service.ExportService;
+import com.tiagoborja.mescala_ai.export.excel.service.ExportService;
 import com.tiagoborja.mescala_ai.service.ScheduleService;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.http.HttpHeaders;
