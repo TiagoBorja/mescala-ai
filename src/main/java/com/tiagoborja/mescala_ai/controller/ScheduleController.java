@@ -24,13 +24,12 @@ import java.util.Map;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+    private final ExportService exportService;
 
     public ScheduleController(ScheduleService scheduleService, ExportService exportService) {
         this.scheduleService = scheduleService;
         this.exportService = exportService;
     }
-
-    private final ExportService exportService;
 
     @PostMapping("/export-excel")
     public ResponseEntity<byte[]> exportScheduleToExcel(@RequestBody ScheduleRequestDTO scheduleRequestDTO) throws IllegalArgumentException {

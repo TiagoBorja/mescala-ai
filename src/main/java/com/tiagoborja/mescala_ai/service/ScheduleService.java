@@ -63,7 +63,7 @@ public class ScheduleService {
 
             responseMap.put(day, responseList);
         }
-        return responseMap;
+        return new TreeMap<>(responseMap);
     }
 
     private PersonRequestDTO getRandomPerson(List<PersonRequestDTO> list) {
