@@ -1,12 +1,10 @@
 package com.tiagoborja.mescala_ai.controller;
 
-import com.tiagoborja.mescala_ai.entity.Schedule;
 import com.tiagoborja.mescala_ai.entity.dto.request.ScheduleRequestDTO;
 import com.tiagoborja.mescala_ai.entity.dto.response.ScheduleResponseDTO;
 import com.tiagoborja.mescala_ai.service.ExportService;
 import com.tiagoborja.mescala_ai.service.ScheduleService;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import java.util.Map;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+
     public ScheduleController(ScheduleService scheduleService, ExportService exportService) {
         this.scheduleService = scheduleService;
         this.exportService = exportService;
@@ -32,27 +32,25 @@ public class ScheduleController {
 
     private final ExportService exportService;
 
-    @PostMapping("/generate-random")
-    public Map<LocalDate, List<ScheduleResponseDTO>> generateRandomSchedule(@RequestBody ScheduleRequestDTO scheduleRequestDTO) {
-        return scheduleService.generateRandomSchedule(scheduleRequestDTO);
-    }
-
     @PostMapping("/export-excel")
-    public ResponseEntity<byte[]> exportScheduleToExcel(@RequestBody ScheduleRequestDTO scheduleRequestDTO) throws Exception {
+    public ResponseEntity<byte[]> exportScheduleToExcel(@RequestBody ScheduleRequestDTO scheduleRequestDTO) throws IllegalArgumentException {
+
         Map<LocalDate, List<ScheduleResponseDTO>> scheduleMap = scheduleService.generateRandomSchedule(scheduleRequestDTO);
 
-        Workbook workbook = exportService.createScheduleExcel(scheduleMap);
+        try (Workbook workbook = exportService.createScheduleExcel(scheduleMap)) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            workbook.write(baos);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        workbook.write(baos);
-        workbook.close();
+            byte[] bytes = baos.toByteArray();
 
-        byte[] bytes = baos.toByteArray();
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=escala.xlsx")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(bytes);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=escala.xlsx")
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(bytes);
     }
 }
 
