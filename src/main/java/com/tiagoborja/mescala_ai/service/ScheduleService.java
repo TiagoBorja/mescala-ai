@@ -33,19 +33,22 @@ public class ScheduleService {
 
             // Store all key/values on groupName
             for (String groupName : groups) {
-                Group group = new Group(groupName);
 
+                Group group = new Group(groupName);
+                String lastPersonAssigned = getLastAssignedPerson(responseMap, day, groupName);
 
                 List<PersonRequestDTO> availablePeople = people.stream()
                         .filter(p -> p.groups() != null && p.groups().contains(groupName))
                         .filter(p -> p.unavailable() == null || !p.unavailable().contains(day))
                         .filter(p -> !assignedPeople.contains(p.name()))
+                        .filter(p -> lastPersonAssigned == null || !lastPersonAssigned.contains(p.name()))
                         .toList();
 
+                PersonRequestDTO selectedPerson = null;
 
-                PersonRequestDTO selectedPerson = availablePeople.isEmpty()
-                        ? null
-                        : getRandomPerson(availablePeople);
+                if (!availablePeople.isEmpty()) {
+                    selectedPerson = getRandomPerson(availablePeople);
+                }
 
                 if (selectedPerson != null) {
                     Person personEntity = DtoUtils.genericMapper(selectedPerson, Person.class);
@@ -68,5 +71,22 @@ public class ScheduleService {
 
     private PersonRequestDTO getRandomPerson(List<PersonRequestDTO> list) {
         return list.get(random.nextInt(list.size()));
+    }
+
+    private String getLastAssignedPerson(Map<LocalDate, List<ScheduleResponseDTO>> scheduleMap,
+                                         LocalDate day,
+                                         String groupName) {
+        LocalDate previousDay = day.minusDays(1);
+
+        List<ScheduleResponseDTO> previousDaySchedules = scheduleMap.get(previousDay);
+
+        if (previousDaySchedules == null)
+            return null;
+
+        Optional<ScheduleResponseDTO> lastSchedule = previousDaySchedules.stream()
+                .filter(s -> groupName.equals(s.group()))
+                .findFirst();
+
+        return lastSchedule.map(ScheduleResponseDTO::person).orElse(null);
     }
 }
