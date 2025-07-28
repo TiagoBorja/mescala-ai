@@ -37,17 +37,18 @@ public class ExportService {
 
         Row headerRow = sheet.createRow(1);
 
-        Cell dateHeaderCell = headerRow.createCell(0);
+        Cell dateHeaderCell = headerRow.createCell(1);
+        dateHeaderCell.setCellValue("DATA");
         dateHeaderCell.setCellStyle(ExcelCellStyle.createColumnHeaderStyle(workbook));
 
-        int colIndex = 1;
+        int colIndex = 2;
         for (String group : groups) {
             Cell groupCell = headerRow.createCell(colIndex++);
             groupCell.setCellValue(group);
             groupCell.setCellStyle(ExcelCellStyle.createColumnHeaderStyle(workbook));
         }
 
-        int rowIndex = 2;
+        int rowIndex = 3;
         for (Map.Entry<LocalDate, List<ScheduleResponseDTO>> entry : scheduleMap.entrySet()) {
             Row row = sheet.createRow(rowIndex++);
 
@@ -65,7 +66,7 @@ public class ExportService {
             Map<String, ScheduleResponseDTO> groupMap = entry.getValue().stream()
                     .collect(java.util.stream.Collectors.toMap(ScheduleResponseDTO::group, s -> s));
 
-            colIndex = 1;
+            colIndex = 2;
             for (String group : groups) {
                 Cell cell = row.createCell(colIndex++);
                 ScheduleResponseDTO schedule = groupMap.get(group);
