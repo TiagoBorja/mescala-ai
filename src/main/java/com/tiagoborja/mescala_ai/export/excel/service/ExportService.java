@@ -1,6 +1,6 @@
 package com.tiagoborja.mescala_ai.export.excel.service;
 
-import com.tiagoborja.mescala_ai.entity.dto.response.ScheduleResponseDTO;
+import com.tiagoborja.mescala_ai.model.dto.response.ScheduleResponseDTO;
 import com.tiagoborja.mescala_ai.export.excel.enums.ExcelCellStyle;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;

@@ -1,13 +1,12 @@
 package com.tiagoborja.mescala_ai.service;
 
 import com.tiagoborja.mescala_ai.Utils.DtoUtils;
-import com.tiagoborja.mescala_ai.entity.Group;
-import com.tiagoborja.mescala_ai.entity.Person;
-import com.tiagoborja.mescala_ai.entity.Schedule;
-import com.tiagoborja.mescala_ai.entity.dto.request.PersonRequestDTO;
-import com.tiagoborja.mescala_ai.entity.dto.request.ScheduleRequestDTO;
-import com.tiagoborja.mescala_ai.entity.dto.response.ScheduleResponseDTO;
-import org.jetbrains.annotations.NotNull;
+import com.tiagoborja.mescala_ai.model.entity.Group;
+import com.tiagoborja.mescala_ai.model.entity.Person;
+import com.tiagoborja.mescala_ai.model.entity.Schedule;
+import com.tiagoborja.mescala_ai.model.dto.request.PersonRequestDTO;
+import com.tiagoborja.mescala_ai.model.dto.request.ScheduleRequestDTO;
+import com.tiagoborja.mescala_ai.model.dto.response.ScheduleResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,7 +17,7 @@ public class ScheduleService {
 
     private final Random random = new Random();
 
-    public Map<LocalDate, List<ScheduleResponseDTO>> generateRandomSchedule(@NotNull ScheduleRequestDTO scheduleRequestDTO) {
+    public Map<LocalDate, List<ScheduleResponseDTO>> generateRandomSchedule(ScheduleRequestDTO scheduleRequestDTO) {
 
         // Just to fill with all schedules per day
         Map<LocalDate, List<ScheduleResponseDTO>> responseMap = new HashMap<>();

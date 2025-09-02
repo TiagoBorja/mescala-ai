@@ -1,4 +1,4 @@
-package com.tiagoborja.mescala_ai.entity;
+package com.tiagoborja.mescala_ai.model.entity;
 
 import java.time.LocalDate;
 

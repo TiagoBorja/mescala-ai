@@ -1,6 +1,4 @@
-package com.tiagoborja.mescala_ai.entity;
-
-import org.springframework.cglib.core.Local;
+package com.tiagoborja.mescala_ai.model.entity;
 
 import java.time.LocalDate;
 import java.util.List;
