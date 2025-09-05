@@ -15,7 +15,7 @@ public class TenantEntity {
     private Long id;
 
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID externalId;
+    private UUID externalId = UUID.randomUUID();
 
     @Column(name = "name", nullable = false, length = 150, unique = true)
     private String name;
@@ -29,8 +29,8 @@ public class TenantEntity {
     @Column(name = "address", nullable = false, length = 100)
     private String address;
 
-    @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private Boolean isActive;
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupEntity> groups = new ArrayList<>();
@@ -95,11 +95,11 @@ public class TenantEntity {
         this.address = address;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setIsActive(Boolean active) {
         this.isActive = active;
     }
 
@@ -120,7 +120,7 @@ public class TenantEntity {
         private String phone;
         private String email;
         private String address;
-        private Boolean isActive;
+        private Boolean isActive = true;
         private List<GroupEntity> groups;
 
         public Builder name(String name) {

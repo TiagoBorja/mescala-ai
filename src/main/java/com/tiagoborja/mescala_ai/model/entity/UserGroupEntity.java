@@ -1,6 +1,5 @@
 package com.tiagoborja.mescala_ai.model.entity;
 
-import com.tiagoborja.mescala_ai.UserGroupIdEntity;
 import jakarta.persistence.*;
 
 @Entity

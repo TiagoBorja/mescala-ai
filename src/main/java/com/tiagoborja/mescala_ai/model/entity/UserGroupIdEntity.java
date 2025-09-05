@@ -1,4 +1,4 @@
-package com.tiagoborja.mescala_ai;
+package com.tiagoborja.mescala_ai.model.entity;
 
 import jakarta.persistence.Embeddable;
 
