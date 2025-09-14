@@ -5,14 +5,17 @@ import com.tiagoborja.mescala_ai.model.dto.response.TenantResponse;
 import com.tiagoborja.mescala_ai.model.entity.TenantEntity;
 
 import java.util.List;
+import java.util.UUID;
 
 public class TenantMapper {
     public static TenantEntity toEntity(TenantRequest request) {
         return TenantEntity.builder()
+                .externalId(UUID.randomUUID())
                 .name(request.name())
                 .phone(request.phone())
                 .email(request.email())
                 .address(request.address())
+                .isActive(true)
                 .build();
     }
 

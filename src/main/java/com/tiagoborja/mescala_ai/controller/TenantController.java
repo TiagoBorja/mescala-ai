@@ -5,6 +5,7 @@ import com.tiagoborja.mescala_ai.model.dto.request.TenantRequest;
 import com.tiagoborja.mescala_ai.model.dto.response.TenantResponse;
 import com.tiagoborja.mescala_ai.model.entity.TenantEntity;
 import com.tiagoborja.mescala_ai.service.TenantService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class TenantController {
     }
 
     @PostMapping
-    public ResponseEntity<TenantResponse> createTenant(@RequestBody TenantRequest request) {
+    public ResponseEntity<TenantResponse> createTenant(@Valid @RequestBody TenantRequest request) {
         TenantEntity saved = tenantService.createTenant(request);
         TenantResponse response = TenantMapper.toResponse(saved);
 
@@ -46,7 +47,7 @@ public class TenantController {
 
     @PatchMapping("/{externalId}")
     public ResponseEntity<TenantResponse> updateTenant(@PathVariable UUID externalId,
-                                                       @RequestBody TenantRequest request) {
+                                                       @Valid @RequestBody TenantRequest request) {
         TenantEntity tenantFound = tenantService.updateTenant(externalId, request);
         TenantResponse response = TenantMapper.toResponse(tenantFound);
         return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -15,7 +15,7 @@ public class TenantEntity {
     private Long id;
 
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID externalId = UUID.randomUUID();
+    private UUID externalId;
 
     @Column(name = "name", nullable = false, length = 150, unique = true)
     private String name;
@@ -30,7 +30,7 @@ public class TenantEntity {
     private String address;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupEntity> groups = new ArrayList<>();
@@ -39,12 +39,17 @@ public class TenantEntity {
     }
 
     private TenantEntity(Builder builder) {
+        this.externalId = builder.externalId;
         this.name = builder.name;
         this.phone = builder.phone;
         this.email = builder.email;
         this.address = builder.address;
         this.isActive = builder.isActive;
         this.groups = builder.groups;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public Long getId() {
@@ -111,17 +116,19 @@ public class TenantEntity {
         this.groups = groups;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static class Builder {
+        private UUID externalId;
         private String name;
         private String phone;
         private String email;
         private String address;
-        private Boolean isActive = true;
+        private Boolean isActive;
         private List<GroupEntity> groups;
+
+        public Builder externalId(UUID externalId) {
+            this.externalId = externalId;
+            return this;
+        }
 
         public Builder name(String name) {
             this.name = name;
