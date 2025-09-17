@@ -6,7 +6,7 @@ import com.tiagoborja.mescala_ai.model.dto.request.TenantRequest;
 import com.tiagoborja.mescala_ai.model.dto.response.TenantResponse;
 import com.tiagoborja.mescala_ai.model.entity.TenantEntity;
 import com.tiagoborja.mescala_ai.repository.TenantRepository;
-import com.tiagoborja.mescala_ai.validator.UpdateTenantValidator;
+import com.tiagoborja.mescala_ai.validator.TenantValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +17,8 @@ import java.util.UUID;
 public class TenantService {
 
     private final TenantRepository tenantRepository;
-    private final UpdateTenantValidator validator;
-    public TenantService(TenantRepository tenantRepository, UpdateTenantValidator validator) {
+    private final TenantValidator validator;
+    public TenantService(TenantRepository tenantRepository, TenantValidator validator) {
         this.tenantRepository = tenantRepository;
         this.validator = validator;
     }
@@ -36,34 +36,17 @@ public class TenantService {
 
     @Transactional
     public TenantEntity createTenant(TenantRequest request) {
+        validator.validate(request);
         TenantEntity entity = TenantMapper.toEntity(request);
         return tenantRepository.save(entity);
     }
 
     @Transactional
     public TenantEntity updateTenant(UUID externalId, TenantRequest request) {
+        validator.validate(request);
         TenantEntity tenant = tenantRepository.findByExternalId(externalId)
                 .orElseThrow(NotFoundException::new);
 
-        validator.validate(request);
-        return tenantRepository.save(tenant);
-    }
-
-    @Transactional
-    public TenantEntity activateTenant(UUID externalId) {
-        TenantEntity tenant = tenantRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new RuntimeException("Tenant not found"));
-
-        tenant.setIsActive(true);
-        return tenantRepository.save(tenant);
-    }
-
-    @Transactional
-    public TenantEntity deactivateTenant(UUID externalId) {
-        TenantEntity tenant = tenantRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new RuntimeException("Tenant not found"));
-
-        tenant.setIsActive(false);
         return tenantRepository.save(tenant);
     }
 }

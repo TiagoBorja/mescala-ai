@@ -6,11 +6,11 @@ import com.tiagoborja.mescala_ai.repository.TenantRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UpdateTenantValidator {
+public class TenantValidator {
 
     private final TenantRepository tenantRepository;
 
-    public UpdateTenantValidator(TenantRepository tenantRepository) {
+    public TenantValidator(TenantRepository tenantRepository) {
         this.tenantRepository = tenantRepository;
     }
 

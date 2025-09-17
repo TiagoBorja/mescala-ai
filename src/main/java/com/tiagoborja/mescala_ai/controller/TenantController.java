@@ -52,16 +52,4 @@ public class TenantController {
         TenantResponse response = TenantMapper.toResponse(tenantFound);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
-    @PatchMapping("/{externalId}/activate")
-    public ResponseEntity<TenantResponse> activateTenant(@PathVariable UUID externalId) {
-        TenantEntity tenant = tenantService.activateTenant(externalId);
-        return ResponseEntity.ok(TenantMapper.toResponse(tenant));
-    }
-
-    @PatchMapping("/{externalId}/deactivate")
-    public ResponseEntity<TenantResponse> deactivateTenant(@PathVariable UUID externalId) {
-        TenantEntity tenant = tenantService.deactivateTenant(externalId);
-        return ResponseEntity.ok(TenantMapper.toResponse(tenant));
-    }
 }
